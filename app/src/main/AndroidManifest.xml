@@ -1,0 +1,22 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.thrive">
+    <application
+        android:allowBackup="true"
+        android:label="Thrive HR Ready"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.App">
+        <activity android:name="com.example.thrive.ui.ProfileActivity" />
+        <activity android:name="com.example.thrive.ui.TransactionsActivity" />
+        <activity android:name="com.example.thrive.ui.SpendingActivity" />
+        <activity android:name="com.example.thrive.ui.AddExpenseActivity" />
+        <activity android:name="com.example.thrive.ui.DashboardActivity" />
+        <activity android:name="com.example.thrive.ui.LoginActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

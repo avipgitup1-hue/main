@@ -1,0 +1,9 @@
+<resources>
+    <color name="primary">#2563EB</color>
+    <color name="primaryDark">#1E40AF</color>
+    <color name="accent">#22C55E</color>
+    <color name="bg">#FAFBFF</color>
+    <color name="card">#FFFFFF</color>
+    <color name="muted">#6B7280</color>
+    <color name="white">#FFFFFF</color>
+</resources>

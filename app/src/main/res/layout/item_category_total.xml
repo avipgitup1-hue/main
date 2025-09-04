@@ -1,0 +1,20 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="12dp"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/nameTv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Transport"/>
+
+    <TextView
+        android:id="@+id/amountTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="$0"/>
+</LinearLayout>
