@@ -349,7 +349,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                         ],
                         
                         // Add Money Button
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -359,6 +359,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green,
                               foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                           ),
                         ),
@@ -372,6 +373,7 @@ class _GoalsScreenState extends State<GoalsScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "goals_fab",
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(

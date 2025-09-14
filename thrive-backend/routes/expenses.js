@@ -8,8 +8,10 @@ const expenseSchema = Joi.object({
   amount: Joi.number().precision(2).required(),
   category: Joi.string().allow(''),
   date: Joi.date().optional(),
-  description: Joi.string().allow('')
-});
+  description: Joi.string().allow(''),
+  _id: Joi.string().optional(),
+  userId: Joi.string().optional()
+}).unknown(true);
 
 router.get('/', auth, async (req, res) => {
   try {

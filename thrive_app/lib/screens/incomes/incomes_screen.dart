@@ -168,13 +168,14 @@ class _IncomesScreenState extends State<IncomesScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Flexible(
+                          Expanded(
                             child: Text(
                               currencyFormat.format(income.amount),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.green,
                               ),
+                              textAlign: TextAlign.right,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -225,6 +226,7 @@ class _IncomesScreenState extends State<IncomesScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "incomes_fab",
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(

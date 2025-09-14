@@ -6,6 +6,7 @@ part 'savings_goal.g.dart';
 class SavingsGoal {
   @JsonKey(name: '_id')
   final String? id;
+  @JsonKey(name: 'userId', fromJson: _userIdFromJson, toJson: _userIdToJson)
   final String userId;
   final String title;
   final double targetAmount;
@@ -20,6 +21,17 @@ class SavingsGoal {
     required this.currentAmount,
     this.deadline,
   });
+
+  static String _userIdFromJson(dynamic userId) {
+    if (userId is String) {
+      return userId;
+    } else if (userId is Map<String, dynamic>) {
+      return userId['_id'] ?? userId['id'] ?? '';
+    }
+    return '';
+  }
+
+  static dynamic _userIdToJson(String userId) => userId;
 
   factory SavingsGoal.fromJson(Map<String, dynamic> json) => _$SavingsGoalFromJson(json);
   Map<String, dynamic> toJson() => _$SavingsGoalToJson(this);

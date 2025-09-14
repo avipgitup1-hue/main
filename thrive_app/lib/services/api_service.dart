@@ -34,24 +34,44 @@ class ApiService {
     }
   }
 
-  static Future<AuthResponse> login(String email, String password) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
+  static Future<Map<String, dynamic>> login(String email, String password) async {
+    try {
+      print('API Service: Attempting login for $email');
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+        }),
+      );
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final authResponse = AuthResponse.fromJson(data);
-      await _storage.write(key: 'auth_token', value: authResponse.token);
-      return authResponse;
-    } else {
-      final error = jsonDecode(response.body);
-      throw Exception(error['msg'] ?? 'Login failed');
+      print('API Service: Login response status: ${response.statusCode}');
+      print('API Service: Login response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        await _storage.write(key: 'auth_token', value: data['token']);
+        print('Login successful: Token stored');
+        return {
+          'success': true,
+          'user': data['user'],
+          'token': data['token']
+        };
+      } else {
+        final error = jsonDecode(response.body);
+        print('API Service: Login failed with error: ${error['msg']}');
+        return {
+          'success': false,
+          'message': error['msg'] ?? 'Login failed'
+        };
+      }
+    } catch (e) {
+      print('API Service: Login exception: $e');
+      return {
+        'success': false,
+        'message': 'Network error: $e'
+      };
     }
   }
 
@@ -60,15 +80,28 @@ class ApiService {
   }
 
   static Future<String?> getToken() async {
-    return await _storage.read(key: 'auth_token');
+    try {
+      return await _storage.read(key: 'auth_token');
+    } catch (e) {
+      print('Error reading token: $e');
+      return null;
+    }
   }
 
   static Future<Map<String, String>> _getHeaders() async {
     final token = await getToken();
-    return {
+    final headers = {
       'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
     };
+    
+    if (token != null && token.isNotEmpty) {
+      headers['x-auth-token'] = token;
+      print('API Service: Using token for request: ${token.substring(0, 10)}...');
+    } else {
+      print('API Service: No token available for request');
+    }
+    
+    return headers;
   }
 
   // Expense endpoints
@@ -89,10 +122,16 @@ class ApiService {
 
   static Future<Expense> createExpense(Expense expense) async {
     final headers = await _getHeaders();
+    final payload = expense.toJson();
+    // Remove fields that should not be sent to backend for new records
+    payload.remove('id');
+    payload.remove('_id');
+    payload.remove('userId');
+    
     final response = await http.post(
       Uri.parse('$baseUrl/expenses'),
       headers: headers,
-      body: jsonEncode(expense.toJson()),
+      body: jsonEncode(payload),
     );
 
     if (response.statusCode == 201) {
@@ -150,10 +189,16 @@ class ApiService {
 
   static Future<Income> createIncome(Income income) async {
     final headers = await _getHeaders();
+    final payload = income.toJson();
+    // Remove fields that should not be sent to backend for new records
+    payload.remove('id');
+    payload.remove('_id');
+    payload.remove('userId');
+    
     final response = await http.post(
       Uri.parse('$baseUrl/incomes'),
       headers: headers,
-      body: jsonEncode(income.toJson()),
+      body: jsonEncode(payload),
     );
 
     if (response.statusCode == 201) {
@@ -211,10 +256,16 @@ class ApiService {
 
   static Future<SavingsGoal> createSavingsGoal(SavingsGoal goal) async {
     final headers = await _getHeaders();
+    final payload = goal.toJson();
+    // Remove fields that should not be sent to backend for new records
+    payload.remove('id');
+    payload.remove('_id');
+    payload.remove('userId');
+    
     final response = await http.post(
       Uri.parse('$baseUrl/goals'),
       headers: headers,
-      body: jsonEncode(goal.toJson()),
+      body: jsonEncode(payload),
     );
 
     if (response.statusCode == 201) {
@@ -311,6 +362,101 @@ class ApiService {
       return data.map((json) => CategoryData.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load category analytics');
+    }
+  }
+
+  // Generic HTTP methods for admin functionality
+  static Future<dynamic> get(String endpoint) async {
+    final headers = await _getHeaders();
+    final response = await http.get(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      throw Exception('Authentication required. Please login.');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access denied. Admin privileges required.');
+    } else {
+      try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['msg'] ?? 'Request failed');
+      } catch (e) {
+        throw Exception('Request failed with status ${response.statusCode}');
+      }
+    }
+  }
+
+  static Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
+    final headers = await _getHeaders();
+    final response = await http.post(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: headers,
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      throw Exception('Authentication required. Please login.');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access denied. Admin privileges required.');
+    } else {
+      try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['msg'] ?? 'Request failed');
+      } catch (e) {
+        throw Exception('Request failed with status ${response.statusCode}');
+      }
+    }
+  }
+
+  static Future<dynamic> patch(String endpoint, Map<String, dynamic> data) async {
+    final headers = await _getHeaders();
+    final response = await http.patch(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: headers,
+      body: jsonEncode(data),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else if (response.statusCode == 401) {
+      throw Exception('Authentication required. Please login.');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access denied. Admin privileges required.');
+    } else {
+      try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['msg'] ?? 'Request failed');
+      } catch (e) {
+        throw Exception('Request failed with status ${response.statusCode}');
+      }
+    }
+  }
+
+  static Future<void> delete(String endpoint) async {
+    final headers = await _getHeaders();
+    final response = await http.delete(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      return;
+    } else if (response.statusCode == 401) {
+      throw Exception('Authentication required. Please login.');
+    } else if (response.statusCode == 403) {
+      throw Exception('Access denied. Admin privileges required.');
+    } else {
+      try {
+        final error = jsonDecode(response.body);
+        throw Exception(error['msg'] ?? 'Request failed');
+      } catch (e) {
+        throw Exception('Request failed with status ${response.statusCode}');
+      }
     }
   }
 }

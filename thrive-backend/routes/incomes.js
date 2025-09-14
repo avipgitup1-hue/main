@@ -7,8 +7,10 @@ const Joi = require('joi');
 const incomeSchema = Joi.object({
   amount: Joi.number().precision(2).required(),
   source: Joi.string().allow(''),
-  date: Joi.date().optional()
-});
+  date: Joi.date().optional(),
+  _id: Joi.string().optional(),
+  userId: Joi.string().optional()
+}).unknown(true);
 
 // Get all incomes for user
 router.get('/', auth, async (req, res) => {

@@ -177,13 +177,14 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Flexible(
+                          Expanded(
                             child: Text(
                               currencyFormat.format(expense.amount),
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.red,
                               ),
+                              textAlign: TextAlign.right,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -235,6 +236,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: "expenses_fab",
         onPressed: () {
           Navigator.of(context).push(
             MaterialPageRoute(

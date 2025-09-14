@@ -131,42 +131,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 24),
 
                   // Savings Goals Progress (using actual goals from DataProvider)
-                  Consumer<DataProvider>(
-                    builder: (context, goalProvider, child) {
-                      if (goalProvider.savingsGoals.isNotEmpty) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Savings Goals',
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
+                  if (dataProvider.savingsGoals.isNotEmpty) ...[
+                    Text(
+                      'Savings Goals',
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 140,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: dataProvider.savingsGoals.length,
+                        itemBuilder: (context, index) {
+                          final goal = dataProvider.savingsGoals[index];
+                          return Container(
+                            width: 200,
+                            margin: EdgeInsets.only(
+                              right: index < dataProvider.savingsGoals.length - 1 ? 12 : 0,
                             ),
-                            const SizedBox(height: 12),
-                            SizedBox(
-                              height: 120,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: goalProvider.savingsGoals.length,
-                                itemBuilder: (context, index) {
-                                  final goal = goalProvider.savingsGoals[index];
-                                  return Padding(
-                                    padding: EdgeInsets.only(
-                                      right: index < goalProvider.savingsGoals.length - 1 ? 12 : 0,
-                                    ),
-                                    child: GoalProgressCard(goal: goal),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
+                            child: GoalProgressCard(goal: goal),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
 
                   // Expense Breakdown Chart
                   if (dashboardData?.categoryBreakdown.isNotEmpty == true) ...[

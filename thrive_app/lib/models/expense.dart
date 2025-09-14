@@ -4,7 +4,9 @@ part 'expense.g.dart';
 
 @JsonSerializable()
 class Expense {
+  @JsonKey(name: '_id')
   final String? id;
+  @JsonKey(name: 'userId', fromJson: _userIdFromJson, toJson: _userIdToJson)
   final String userId;
   final double amount;
   final String category;
@@ -19,6 +21,17 @@ class Expense {
     this.description,
     required this.date,
   });
+
+  static String _userIdFromJson(dynamic userId) {
+    if (userId is String) {
+      return userId;
+    } else if (userId is Map<String, dynamic>) {
+      return userId['_id'] ?? userId['id'] ?? '';
+    }
+    return '';
+  }
+
+  static dynamic _userIdToJson(String userId) => userId;
 
   factory Expense.fromJson(Map<String, dynamic> json) => _$ExpenseFromJson(json);
   Map<String, dynamic> toJson() => _$ExpenseToJson(this);

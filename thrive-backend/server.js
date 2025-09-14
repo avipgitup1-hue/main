@@ -26,6 +26,7 @@ app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/incomes', require('./routes/incomes'));
 app.use('/api/goals', require('./routes/goals'));
 app.use('/api/predict', require('./routes/predict'));
+app.use('/api/admin', require('./routes/admin'));
 
 // simple health check
 app.get('/', (req, res) => res.json({ ok: true, env: process.env.NODE_ENV || 'dev' }));

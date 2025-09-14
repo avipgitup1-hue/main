@@ -12,7 +12,23 @@ router.get('/', auth, async (req, res) => {
     const amounts = expenses.map(e => e.amount || 0);
     const avg = amounts.length ? amounts.reduce((s,a)=>s+a,0)/amounts.length : 0;
     const predicted = +(avg * 1.05).toFixed(2); // naive +5%
-    res.json({ predictedSpending: predicted, confidence: 0.7 });
+    
+    // Get current month name
+    const currentDate = new Date();
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"];
+    const currentMonth = monthNames[currentDate.getMonth()];
+    
+    res.json({ 
+      predictedSpending: predicted, 
+      confidenceScore: 0.7,
+      month: currentMonth,
+      recommendations: [
+        "Consider setting a monthly budget limit",
+        "Track your spending in the Transport category",
+        "Look for ways to reduce unnecessary expenses"
+      ]
+    });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }

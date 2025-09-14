@@ -69,8 +69,8 @@ class _AddEditExpenseScreenState extends State<AddEditExpenseScreen> {
       final dataProvider = Provider.of<DataProvider>(context, listen: false);
       
       final expense = Expense(
-        id: widget.expense?.id,
-        userId: widget.expense?.userId ?? '',
+        id: widget.expense?.id, // Only set for updates, null for new expenses
+        userId: widget.expense?.userId ?? '', // Keep for model consistency
         amount: double.parse(_amountController.text),
         category: _selectedCategory,
         description: _descriptionController.text.trim(),
@@ -159,7 +159,7 @@ class _AddEditExpenseScreenState extends State<AddEditExpenseScreen> {
 
               // Category Dropdown
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: const InputDecoration(
                   labelText: 'Category',
                   border: OutlineInputBorder(),

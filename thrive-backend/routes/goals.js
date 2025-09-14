@@ -8,8 +8,10 @@ const goalSchema = Joi.object({
   title: Joi.string().required(),
   targetAmount: Joi.number().precision(2).required(),
   currentAmount: Joi.number().precision(2).optional(),
-  deadline: Joi.date().optional()
-});
+  deadline: Joi.date().optional(),
+  _id: Joi.string().optional(),
+  userId: Joi.string().optional()
+}).unknown(true);
 
 // Get all savings goals for user
 router.get('/', auth, async (req, res) => {

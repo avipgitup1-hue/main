@@ -6,6 +6,7 @@ part 'income.g.dart';
 class Income {
   @JsonKey(name: '_id')
   final String? id;
+  @JsonKey(name: 'userId', fromJson: _userIdFromJson, toJson: _userIdToJson)
   final String userId;
   final double amount;
   final String source;
@@ -18,6 +19,17 @@ class Income {
     required this.source,
     required this.date,
   });
+
+  static String _userIdFromJson(dynamic userId) {
+    if (userId is String) {
+      return userId;
+    } else if (userId is Map<String, dynamic>) {
+      return userId['_id'] ?? userId['id'] ?? '';
+    }
+    return '';
+  }
+
+  static dynamic _userIdToJson(String userId) => userId;
 
   factory Income.fromJson(Map<String, dynamic> json) => _$IncomeFromJson(json);
   Map<String, dynamic> toJson() => _$IncomeToJson(this);

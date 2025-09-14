@@ -30,9 +30,13 @@ class _MainScreenState extends State<MainScreen> {
   @override
   void initState() {
     super.initState();
-    // Load initial data
+    // Load initial data after a delay to ensure auth is fully set up
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<DataProvider>(context, listen: false).loadAllData();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          Provider.of<DataProvider>(context, listen: false).loadAllData();
+        }
+      });
     });
   }
 

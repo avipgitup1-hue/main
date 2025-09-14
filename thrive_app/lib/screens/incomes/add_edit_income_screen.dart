@@ -154,7 +154,7 @@ class _AddEditIncomeScreenState extends State<AddEditIncomeScreen> {
 
               // Source Dropdown
               DropdownButtonFormField<String>(
-                value: _selectedSource,
+                initialValue: _selectedSource,
                 decoration: const InputDecoration(
                   labelText: 'Source',
                   border: OutlineInputBorder(),

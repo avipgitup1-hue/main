@@ -16,7 +16,7 @@ class GoalProgressCard extends StatelessWidget {
     final progressPercentage = goal.progress.clamp(0.0, 100.0);
     
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -31,6 +31,7 @@ class GoalProgressCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
@@ -59,7 +60,7 @@ class GoalProgressCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           
           // Progress Bar
           ClipRRect(
@@ -73,7 +74,7 @@ class GoalProgressCard extends StatelessWidget {
               minHeight: 8,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 6),
           
           // Amount Info
           Row(
@@ -90,7 +91,7 @@ class GoalProgressCard extends StatelessWidget {
                   ),
                   Text(
                     currencyFormat.format(goal.currentAmount),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -107,7 +108,7 @@ class GoalProgressCard extends StatelessWidget {
                   ),
                   Text(
                     currencyFormat.format(goal.targetAmount),
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -116,17 +117,21 @@ class GoalProgressCard extends StatelessWidget {
             ],
           ),
           
-          // Deadline if available
+          // Deadline if available (only show if space permits)
           if (goal.deadline != null) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Row(
               children: [
-                Icon(Icons.schedule, size: 16, color: Colors.grey[600]),
+                Icon(Icons.schedule, size: 14, color: Colors.grey[600]),
                 const SizedBox(width: 4),
-                Text(
-                  'Due: ${DateFormat('MMM dd, yyyy').format(goal.deadline!)}',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey[600],
+                Expanded(
+                  child: Text(
+                    'Due: ${DateFormat('MMM dd').format(goal.deadline!)}',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Colors.grey[600],
+                      fontSize: 10,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

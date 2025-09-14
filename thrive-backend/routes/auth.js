@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 const User = require('../models/User');
+const auth = require('../middleware/auth');
 
 const registerSchema = Joi.object({
   name: Joi.string().allow(''),
@@ -26,7 +27,7 @@ router.post('/register', async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
@@ -50,7 +51,20 @@ router.post('/login', async (req, res) => {
     if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user._id, name: user.name, email: user.email } });
+    res.json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+});
+
+// Get current user info (validate token)
+router.get('/me', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-passwordHash');
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+    res.json({ id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
